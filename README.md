@@ -337,6 +337,10 @@ SOFTWARE.
 - **Issues**: [GitHub Issues](https://github.com/vigorlee/RoboKino/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/vigorlee/RoboKino/discussions)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=vigorlee/RoboKino&type=Date)](https://star-history.com/#vigorlee/RoboKino&Date)
+
 ---
 
 *RoboKino establishes a solid foundation for scalable dual-arm robotic systems with community-wide reproducibility.*
