@@ -17,10 +17,7 @@ RoboKino structures dual-arm behaviors into five cooperative atomic controllers 
 - **Fine-Grained Evaluation**: Stage-wise progress assessment and coordination analysis
 - **End-to-End Pipeline**: Unified data acquisition, training, and inference workflow
 
-### Performance Metrics
 
-- Average Trajectory Smoothness: **81.3%**
-- Average Spatial Complexity: **82.4%**
 
 ## Atomic Controllers
 
