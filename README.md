@@ -1,6 +1,7 @@
 # RoboKino
 
-![RoboKino Platform](https://github.com/user-attachments/assets/placeholder-for-your-image)
+<img width="1084" height="398" alt="image" src="https://github.com/user-attachments/assets/83bd8af2-5cd2-4114-a3dc-f08fb48b4caf" />
+
 
 ## Abstract
 
