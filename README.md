@@ -9,7 +9,7 @@ RoboKino structures dual-arm behaviors into five cooperative atomic controllers 
 ### Key Features
 
 - **5 Atomic Dual-Arm Controllers**: Composable controllers for complex collaborative tasks
-- **10,000+ Expert Trajectories**: LeRobot v2.1-compliant dataset with human-operated demonstrations
+- **10,000+ Expert Trajectories**: LeRobot v2.1-compliant dataset
 - **500 Interactive Assets**: Reusable assets spanning domestic, desktop/office, and industrial scenes
 - **Domain Randomization**: Enhanced task diversification and generalization
 - **Isaac Sim Integration**: Photorealistic rendering and physics simulation
@@ -43,7 +43,7 @@ Coordinated pushing and pulling actions for drawers, sliding doors, and heavy ob
 RoboKino supports diverse manipulation scenarios across three domains:
 
 ### Domestic Scenes
-Kitchen and household tasks requiring dual-arm coordination (cooking, cleaning, organizing).
+Kitchen and household tasks requiring dual-arm coordination (cleaning, organizing).
 
 ### Desktop/Office Scenes
 Office manipulation tasks (document handling, tool organization, device operation).
@@ -73,163 +73,49 @@ git clone --recurse-submodules https://github.com/vigorlee/RoboKino.git
 cd RoboKino
 ```
 
-3. **Create and activate conda environment**
+3. **By adding mappings in the .bashrc file, you can invoke the Python environment using the mapped variables**
 
 ```bash
-conda create -n robokino python=3.10
-conda activate robokino
+  alias benchmark_python='~/.local/share/ov/pkg/isaac-sim-<version>/python.sh' #添加映射
+  benchmark_python <python_file_name> #运行代码
 ```
 
 4. **Install the package**
 
 ```bash
-# Basic installation
-pip install -e .
-
-# Install with training dependencies
-pip install -e ".[train]"
-
-# Install with all dependencies
-pip install -e ".[all]"
+    pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu118
+    ~/.local/share/ov/pkg/isaac-sim-4.2.0/python.sh -m pip install -r requirements.txt
 ```
 
-### Verify Installation
+## Project Structure
 
-Test your installation by running a simple demo:
+BENCHMARK_ENV
+├── ACT              # (For reference) Training and inference code for ACT models based on this dataset
+├── assets           # Assets related to scenes, robots, and objects
+├── controllers      # Robotic arm motion controllers
+├── data_collect     # Data collection pipelines for tasks
+├── envs             # Simulator configuration and environment setup
+├── tasks            # Task randomization and evaluation metric definitions
 
+## Training Data Collection
+
+### Fruit Pick-and-Place in Kitchen and Living Room Environments
 ```bash
-python examples/demo_replay.py
+    benchmark_python data_collect/pick_place_fruit/fruit_pick_place_collect.py --table <TABLE> --config <CONFIG> --base <BASE>
 ```
-
-## Getting Started
-
-### 1. Basic Demo Replay
-
-Start with the simplest example to verify your setup:
-
-```bash
-python examples/1_replay_demo.py
-```
-
-This script demonstrates:
-- Loading LeRobot v2.1-compliant trajectories
-- Replaying demonstrations in Isaac Sim
-- Basic environment and robot control
-- Visualization of dual-arm coordination
-
-### 2. Understanding Atomic Controllers
-
-Learn about the five atomic controllers:
-
-```bash
-python examples/2_atomic_controllers.py
-```
-
-Features:
-- Individual controller demonstrations
-- Parameter configurations
-- Composing controllers into sequences
-- Switching between controllers
-
-### 3. Task Composition
-
-Create complex tasks by composing atomic controllers:
-
-```bash
-python examples/3_compose_tasks.py
-```
-
-This example shows:
-- Long-horizon task planning
-- Controller sequencing
-- State transitions between controllers
-- Task-specific parameter tuning
-
-### 4. Domain Randomization
-
-Explore domain randomization capabilities:
-
-```bash
-python examples/4_domain_randomization.py
-```
-
-Demonstrates:
-- Visual randomization (lighting, textures, camera poses)
-- Physical randomization (object properties, friction)
-- Task variants generation
-- Evaluation across randomized scenarios
-
-### 5. Model Evaluation
-
-Evaluate trained policies on RoboKino tasks.
-
-#### Parameters
-
-**Model Configuration:**
-- `--model_path`: Path to trained model checkpoint
-- `--model_type`: Model architecture (e.g., 'act', 'diffusion_policy', 'vla')
-- `--device`: Device for inference ('cuda' or 'cpu')
-
-**Task Configuration:**
-- `--task`: Task name or path to task configuration
-- `--controller`: Specific atomic controller to evaluate
-- `--num_episodes`: Number of evaluation episodes (default: 50)
-- `--max_steps`: Maximum steps per episode (default: 500)
-
-**Evaluation Options:**
-- `--enable_recording`: Record evaluation videos
-- `--save_metrics`: Save detailed metrics to file
-- `--output_dir`: Directory for outputs (default: './eval_results')
-- `--seed`: Random seed for reproducibility
-
-**Visualization:**
-- `--render`: Enable real-time rendering
-- `--camera_view`: Camera perspective ('front', 'side', 'top', 'ego')
-- `--show_coordination`: Visualize inter-arm coordination metrics
-
-## Dataset Structure
-
-RoboKino datasets follow the LeRobot v2.1 format for maximum compatibility:
-
-```
-data/
-├── domestic/
-│   ├── task_name/
-│   │   ├── episode_000000.hdf5
-│   │   ├── episode_000001.hdf5
-│   │   └── ...
-├── desktop_office/
-│   └── ...
-├── industrial/
-│   └── ...
-└── metadata.json
-```
-
-### Data Format
-
-Each episode contains:
-- **Observations**: RGB images, depth, proprioceptive states
-- **Actions**: Joint positions/velocities for dual arms
-- **Rewards**: Stage-wise progress and task completion
-- **Metadata**: Task parameters, controller sequence, randomization settings
-
-### Loading Datasets
-
-```python
-from robokino.dataset import RoboKinoDataset
-
-# Load dataset
-dataset = RoboKinoDataset(
-    data_path="./data/domestic",
-    task="pick_and_place",
-    split="train"
-)
-
-# Access episodes
-episode = dataset[0]
-print(f"Actions shape: {episode['actions'].shape}")
-print(f"Observations: {episode['observations'].keys()}")
-```
+#### Table
+- `kitchen_table`
+- `apartment_table`
+#### Config
+- `apple_pick_place_config.yaml`
+- `banana_pick_place_config.yaml`
+- `carrot_pick_place_config.yaml`
+- `cucumber_pick_place_config.yaml`
+- `mangosteen_pick_place_config.yaml`
+- `whiteradish_pick_place_config.yaml`
+### Base
+- `base_kitchen`
+- `base_apartment`
 
 ## Standard Evaluation Metrics
 
@@ -245,7 +131,6 @@ RoboKino defines four standardized metrics for unified evaluation:
 ### Additional Analysis
 
 - **Stage-wise Progress**: Completion status of individual task stages
-- **Inter-arm Coordination**: Synchronization and coordination quality metrics
 - **Trajectory Quality**: Smoothness, efficiency, and spatial accuracy
 
 ## Assets Library
@@ -258,22 +143,7 @@ RoboKino includes 500+ interactive assets:
 - **Kitchen Items**: Pots, utensils, appliances
 - **Office Objects**: Documents, staplers, organizers
 - **Tools**: Screwdrivers, wrenches, assembly components
-- **Articulated Objects**: Doors, valves, levers
-
-### Using Assets
-
-```python
-from robokino.assets import AssetLibrary
-
-# Load asset library
-library = AssetLibrary()
-
-# Get asset by category
-kitchen_assets = library.get_by_category("kitchen")
-
-# Spawn asset in scene
-pot = library.spawn_asset("pot_001", position=[0.5, 0, 0.8])
-```
+- **Articulated Objects**: Doors, valves
 
 ## Contributing
 
