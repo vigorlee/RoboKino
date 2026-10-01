@@ -1,0 +1,24 @@
+# Modified by RoboKino on 2026-10-02: add local environment and output exclusions.
+assets/
+data/
+scripts/
+.ruff_cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# VS Code
+.vscode/
+
+# Local environments, caches, and generated outputs
+.venv/
+venv/
+.pytest_cache/
+.uv-cache/
+outputs/
+*.hdf5
+*.h5
+.env
+.env.*

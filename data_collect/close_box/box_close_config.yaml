@@ -1,0 +1,34 @@
+headless: False
+task: "CloseBox"
+robot: "piper"
+nut: "nut"
+box: "box"
+max_demo: 400
+cameras:
+    left_cam:
+      prim_path: /World/piper_left_arm/link6/left_cam
+      name: left_cam
+      width: 640
+      height: 480
+      frequency: 30
+      translation: [-0.06902, 0.00181, 0.04005]
+      orientation: [0.12279, 0.69636, -0.69636, -0.12279]
+      intrinsics: [386.81866455078125, 386.2845458984375, 316.95684814453125, 237.30592346191406]
+    right_cam:
+      prim_path: /World/piper_right_arm/link6/right_cam
+      name: right_cam
+      width: 640
+      height: 480
+      frequency: 30
+      translation: [-0.06902, 0.00181, 0.04005]
+      orientation: [0.12279, 0.69636, -0.69636, -0.12279]
+      intrinsics: [386.81866455078125, 386.2845458984375, 316.95684814453125, 237.30592346191406]
+    head_cam:
+      prim_path: /World/piper_base/head_cam
+      name: head_cam
+      width: 640
+      height: 480
+      frequency: 30
+      translation: [0.23882, 0.0, 1.2]
+      orientation: [0.63554, 0.30998, -0.30998, -0.63554]
+      intrinsics: [290.11, 289.71, 316.95684814453125, 237.30592346191406]

@@ -1,0 +1,19 @@
+RoboKino
+
+The simulation implementation in this distribution includes code from FluxBisim:
+https://github.com/FluxVLA/FluxBisim
+Upstream commit: 621df43e08df3f27b5355e65e3f2c2918750bccb
+
+Copyright 2026 FluxVLA Engine Team, LimX Dynamics
+Source file notices also identify Copyright 2026 Limx Dynamics.
+The imported code remains licensed under Apache License 2.0 (see LICENSE).
+AgileX Robotics provided the upstream Piper platform URDF model.
+
+RoboKino additions: Copyright (c) 2026 vigorlee.
+Original RoboKino documentation and the new launcher/checking utility are
+licensed under MIT (see licenses/MIT-RoboKino.txt).
+The RoboKino platform overview was supplied by the project author.
+
+The upstream README, framework image, video attachment, leaderboard, and
+external simulation asset/dataset contents were not imported.
+See THIRD_PARTY.md and docs/upstream-import.json for import scope and changes.

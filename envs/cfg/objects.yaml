@@ -1,0 +1,119 @@
+# environments
+kitchen_table:
+  name: kitchen_table
+  usd_path: assets/environments/KitchenRoom/kitchen_room.usd
+  position: [ 0.0, 0.0, 0.0]
+  orientation: [1.0, 0.0, 0.0, 0.0]
+
+apartment_table:
+  name: apartment_table
+  usd_path: assets/environments/Apartment/apartment.usd
+  position: [ 0.0, 0.0, 0.0]
+  orientation: [1.0, 0.0, 0.0, 0.0]
+
+apartmentshort_table:
+  name: apartmentshort_table
+  usd_path: assets/environments/Apartment/apartment_short.usd
+  position: [ 0.0, 0.0, 0.0]
+  orientation: [1.0, 0.0, 0.0, 0.0]
+
+industry_table:
+  name: industry_table
+  usd_path: assets/environments/industry/industry.usd
+  position: [0.0, 0.0, 0.0]
+  orientation: [1.0, 0.0, 0.0, 0.0]
+
+# close box
+box:
+  name: box
+  usd_path: assets/close_box/box.usd
+  position: [0.765, 0.04985, 0.75]
+  orientation: [0.69863, -0.0178, -0.71506, -0.01706]
+
+nut:
+  name: nut
+  usd_path: assets/close_box/nut.usd
+  position: [0.60019, 0.4, 0.75]
+  orientation: [0.707107, 0.0, 0.0, 0.707107]
+
+# handover book
+book:
+  name: book
+  usd_path: assets/handover_book/book/book.usd
+  position: [0.5, 0.2, 0.75]
+  orientation: [0.53022, -0.47429, 0.46855, -0.52381]
+
+bookend:
+  name: bookend
+  usd_path: assets/handover_book/bookend/bookend.usd
+  position: [0.92, -0.45, 0.9]
+  orientation: [0.70711, 0.0, 0.0, 0.70711]
+
+# pick place fruit
+plate:
+  name: plate
+  usd_path: assets/pick_place_fruit/plate/base.usd
+  position: [ 0.60, -0.05,  0.75]
+  orientation: [0.73158, 0.68176, 0.0,0.0]
+
+apple:
+  name: apple
+  usd_path: assets/pick_place_fruit/apple/apple.usd
+  position: [ 0.60, -0.35,  0.75]
+  orientation: [0.7071, 0.7071, 0.0, 0.0]
+
+banana:
+  name: banana
+  usd_path: assets/pick_place_fruit/banana/banana.usd
+  position: [ 0.60, -0.35,  0.75]
+  orientation: [0.73158, 0.68176, 0.0,0.0]
+
+carrot:
+  name: carrot
+  usd_path: assets/pick_place_fruit/carrot/carrot.usd
+  position: [ 0.60, -0.35,  0.75]
+  orientation: [0.132, 0.87719, -0.02307,-0.46107]
+
+cucumber:
+  name: cucumber
+  usd_path: assets/pick_place_fruit/cucumber/cucumber.usd
+  position: [ 0.60, -0.35,  0.75]
+  orientation: [0.132, 0.87719, -0.02307,-0.46107]
+
+mangosteen:
+  name: mangosteen
+  usd_path: assets/pick_place_fruit/mangosteen/mangosteen.usd
+  position: [ 0.60, -0.35,  0.75]
+  orientation: [0.7071, 0.0, 0.7071, 0.0]
+
+whiteradish:
+  name: whiteradish
+  usd_path: assets/pick_place_fruit/whiteradish/whiteradish.usd
+  position: [ 0.60, -0.35,  0.75]
+  orientation: [0.132, 0.87719, -0.02307,-0.46107]
+
+# pull push drawer
+drawer:
+  name: drawer
+  usd_path: assets/pull_push_drawer/drawer/drawer.usd
+  position: [0.95, -0.1, 0.8]
+  orientation: [0.7071, 0.0, 0.0, 0.7071]
+
+apple_drawer:
+  name: apple_drawer
+  usd_path: assets/pull_push_drawer/apple/apple.usd
+  position: [ 0.50, 0.3,  0.75]
+  orientation: [0.7071, 0.7071, 0.0, 0.0]
+
+# screw pitcher lid
+pitcher:
+  name: pitcher
+  usd_path: assets/screw_pitcher_lid/Pitcher/pitcher.usd
+  position: [0.58693,0.08, 0.62]
+  orientation: [-0.00783, 0.01784, 0.04364, 0.99886]
+
+pitcherlid:
+  name: pitcherlid
+  usd_path: assets/screw_pitcher_lid/PitcherLid/pitcherlid.usd
+  position: [0.58693,-0.22228, 0.62]
+  orientation: [0.86145, 0.0, 0.0, 0.50785]

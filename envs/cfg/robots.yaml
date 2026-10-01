@@ -1,0 +1,29 @@
+base_kitchen:
+  usd_path: assets/mobile_aloha_base.usd
+  position: [0.2, -0.53, 0.0]
+  orientation: [0.7071, 0.0, 0.0, 0.7071]
+
+base_apartment:
+  usd_path: assets/mobile_aloha_base.usd
+  position: [-2.62791, 0.86762, 0.0]
+  orientation: [0.7071, 0.0, 0.0, 0.7071]
+
+base_apartmentshort:
+  usd_path: assets/mobile_aloha_base.usd
+  position: [-2.62791, 0.86762, 0.0]
+  orientation: [0.7071, 0.0, 0.0, 0.7071]
+
+base_industry:
+  usd_path: assets/mobile_aloha_base.usd
+  position: [-5.0, 9.25, 0.0]
+  orientation: [0.7071, 0.0, 0.0, 0.7071]
+
+left_arm:
+  usd_path: assets/piper_left.usd
+  position: [0.23956, 0.29974, 0.77633]
+  orientation: [1.0, 0.0, 0.0, 0.00172]
+
+right_arm:
+  usd_path: assets/piper_right.usd
+  position: [0.23956, -0.29974, 0.77633]
+  orientation: [1.0, 0.0, 0.0, 0.00172]

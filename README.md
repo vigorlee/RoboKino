@@ -1,217 +1,202 @@
+<div align="center">
+
 # RoboKino
 
-## About
+**Dual-arm manipulation · Expert data collection · Simulation-based evaluation**
 
-**RoboKino** is an Isaac Sim-based benchmark and data-generation framework for fine-grained dual-arm manipulation. It extends the Aloha dual-arm platform in simulation and leverages Isaac Sim's photorealistic rendering capabilities.
+[Quick Start](#quick-start) · [Tasks](#tasks-and-controllers) · [Data Collection](#data-collection) · [Evaluation](#policy-evaluation) · [中文说明](README_zh-CN.md)
 
-RoboKino structures dual-arm behaviors into five cooperative atomic controllers that compose long-horizon task sequences. It supports controlled task variants with domain randomization and provides diagnostic evaluation beyond binary success via stage-wise progress checks and coordination analysis.
+</div>
 
-### Key Features
+<p align="center">
+  <a href="docs/images/robokino-framework.pdf">
+    <img src="docs/images/robokino-framework.png" alt="RoboKino platform overview: dual-arm scenes, atomic controllers, data collection, and process evaluation" width="100%">
+  </a>
+</p>
 
-- **5 Atomic Dual-Arm Controllers**: Composable controllers for complex collaborative tasks
-- **10,000+ Expert Trajectories**: LeRobot v2.1-compliant dataset
-- **500 Interactive Assets**: Reusable assets spanning domestic, desktop/office, and industrial scenes
-- **Domain Randomization**: Enhanced task diversification and generalization
-- **Isaac Sim Integration**: Photorealistic rendering and physics simulation
-- **Aloha-Compatible**: Hardware-aligned dual-arm configuration
-- **Fine-Grained Evaluation**: Stage-wise progress assessment and coordination analysis
-- **End-to-End Pipeline**: Unified data acquisition, training, and inference workflow
+*RoboKino platform overview, supplied by the project author. Click the figure for the vector PDF. The figure presents the broader project design; the release status below describes the code currently included here.*
 
+## Overview
 
+RoboKino is an Isaac Sim-based project for dual-arm manipulation, expert demonstration collection, and fine-grained evaluation. Its design organizes manipulation around five families of atomic skills: pick/place, open/close, handover, rotation, and pull/push, with domestic, desktop, and industrial scenarios.
 
-## Atomic Controllers
+This repository now includes a simulation implementation adapted from [FluxBisim](https://github.com/FluxVLA/FluxBisim), with task controllers, scene and robot configuration, HDF5 collection scripts, and a ROS-based policy evaluation interface. The imported configuration uses a mobile ALOHA-style base with two Piper arms. Code provenance and local additions are documented in [THIRD_PARTY.md](THIRD_PARTY.md).
 
-RoboKino provides five cooperative dual-arm atomic controllers that can be composed into long-horizon task sequences:
+## Release Status
 
-### 1. Pick/Place Controller
-Coordinated grasping and placement operations for dual-arm object manipulation.
+| Component | Included in this repository |
+| --- | --- |
+| Five task families and scripted controllers | Source code and collection configurations |
+| Isaac Sim environment | Robot, scene-object, camera, and task wrappers |
+| Demonstration collection | Per-episode HDF5 writer with RGB observations, joint states, and actions |
+| Policy evaluation | Five task presets, ROS observation/action bridge, success rate and completion-step statistics |
+| RoboKino figures | Author-supplied platform overview in PNG and PDF |
+| 3D simulation assets | Download separately; configuration expects `assets/` |
+| Training and LeRobot conversion | External FluxVLA workflow; links below |
+| TCT, DBR, TCP and richer process diagnostics | Part of the RoboKino design; full reporting is a roadmap item |
 
-### 2. Open/Close Controller
-Bimanual operations for opening/closing containers, drawers, doors, and other articulated objects.
+RoboKino-specific trajectory releases, the full asset collection shown in the overview, paper metadata, and measured benchmark results will be documented when they are released. The external assets and datasets linked below remain attributed to their original providers.
 
-### 3. Handover Controller
-Object transfer between arms, enabling in-hand manipulation and workspace extension.
+## Tasks and Controllers
 
-### 4. Rotate Controller
-Synchronized rotation of objects requiring two-handed manipulation (e.g., valves, lids, steering wheels).
+| Skill | Example task | Collection script | Scene | Configuration |
+| --- | --- | --- | --- | --- |
+| Pick / place | Place fruit on a plate | [`fruit_pick_place_collect.py`](data_collect/pick_place_fruit/fruit_pick_place_collect.py) | `kitchen`, `apartment` | `{fruit}_pick_place_config.yaml` |
+| Open / close | Place a nut and close the box | [`box_close_collect.py`](data_collect/close_box/box_close_collect.py) | `industry` | `box_close_config.yaml` |
+| Handover | Transfer and store a book | [`book_handover_collect.py`](data_collect/handover_book/book_handover_collect.py) | `apartment`, `industry` | `book_handover_config.yaml` |
+| Pull / push | Store an apple in a drawer | [`drawer_pull_push_collect.py`](data_collect/pull_push_drawer/drawer_pull_push_collect.py) | `apartment` | `drawer_pull_push_config.yaml` |
+| Rotation | Screw a pitcher lid | [`pitcher_lid_screw_collect.py`](data_collect/screw_pitcher_lid/pitcher_lid_screw_collect.py) | `apartmentshort` | `pitcher_lid_screw_config.yaml` |
 
-### 5. Pull/Push Controller
-Coordinated pushing and pulling actions for drawers, sliding doors, and heavy objects.
+Fruit configurations are provided for `apple`, `banana`, `carrot`, `cucumber`, `mangosteen`, and `whiteradish`. Motion generation uses the Piper URDF and RMPflow configuration in [`controllers/motion/`](controllers/motion/).
 
-## Task Scenarios
+## Quick Start
 
-RoboKino supports diverse manipulation scenarios across three domains:
+### 1. Set up the simulator
 
-### Domestic Scenes
-Kitchen and household tasks requiring dual-arm coordination (cleaning, organizing).
-
-### Desktop/Office Scenes
-Office manipulation tasks (document handling, tool organization, device operation).
-
-### Industrial Scenes
-Manufacturing and assembly tasks requiring precise bimanual coordination.
-
-## Installation
-
-### Prerequisites
-
-- Python 3.10+
-- NVIDIA GPU with RTX support (recommended for Isaac Sim)
-- Isaac Sim 2023.1.0 or later
-- CUDA 11.8+ and compatible drivers
-
-### Setup Environment
-
-1. **Install Isaac Sim**
-
-Follow the [official Isaac Sim installation guide](https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_workstation.html).
-
-2. **Clone the repository**
+The imported code targets **Isaac Sim 4.5.0**. Use its bundled Python environment and an NVIDIA GPU compatible with that release. The commands below use Linux/bash. See NVIDIA's [Isaac Sim 4.5.0 download page](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/installation/download.html).
 
 ```bash
-git clone --recurse-submodules https://github.com/vigorlee/RoboKino.git
+git clone https://github.com/vigorlee/RoboKino.git
 cd RoboKino
+
+export ISAAC_SIM_PATH=/path/to/isaac-sim-4.5.0
+"${ISAAC_SIM_PATH}/python.sh" -m pip install -r requirements.txt
+alias benchmark_python="${ISAAC_SIM_PATH}/python.sh"
 ```
 
-3. **By adding mappings in the .bashrc file, you can invoke the Python environment using the mapped variables**
+Newer Isaac Sim versions may require API changes. Isaac Sim and ROS are installed separately; `requirements.txt` supplies the additional Python dependencies.
+
+### 2. Prepare simulation assets
+
+For the imported task configurations, download the original [FluxBisimAssets](https://huggingface.co/datasets/limxdynamics/FluxBisimAssets) into `assets/`. Install the [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/guides/cli) in a separate download environment if `hf` is unavailable.
 
 ```bash
-  alias benchmark_python='~/.local/share/ov/pkg/isaac-sim-<version>/python.sh' #添加映射
-  benchmark_python <python_file_name> #运行代码
+mkdir -p assets
+hf download limxdynamics/FluxBisimAssets \
+  --repo-type dataset \
+  --local-dir assets
 ```
 
-4. **Install the package**
+These are external simulation assets, licensed separately under **CC BY-NC 4.0** according to their dataset card. The Apache/MIT source licenses do not replace the asset license. The 3D assets are not bundled with this repository.
+
+To use your own RoboKino assets, update [`envs/cfg/objects.yaml`](envs/cfg/objects.yaml) and [`envs/cfg/robots.yaml`](envs/cfg/robots.yaml). Preserve the expected robot articulation, joint, and camera prim names or update the corresponding Python wrappers. See [runtime and asset notes](docs/runtime.md).
+
+### 3. Collect a first demonstration set
+
+Run from the repository root. Set `max_demo` in the selected YAML file to control the number of successful demonstrations.
 
 ```bash
-    pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu118
-    ~/.local/share/ov/pkg/isaac-sim-4.2.0/python.sh -m pip install -r requirements.txt
+benchmark_python data_collect/pick_place_fruit/fruit_pick_place_collect.py \
+  --env kitchen \
+  --config banana_pick_place_config.yaml \
+  --data_path data/robokino/pick_place_banana
 ```
 
-## Project Structure
+The current collection entry points start a graphical simulator. They save successful episodes only; a difficult scene may require more attempts than the configured number of demonstrations.
 
-BENCHMARK_ENV
-├── ACT              # (For reference) Training and inference code for ACT models based on this dataset
-├── assets           # Assets related to scenes, robots, and objects
-├── controllers      # Robotic arm motion controllers
-├── data_collect     # Data collection pipelines for tasks
-├── envs             # Simulator configuration and environment setup
-├── tasks            # Task randomization and evaluation metric definitions
+## Data Collection
 
-## Training Data Collection
+All five entry points accept `--env`, `--config`, and optional `--data_path`. Configuration names resolve relative to the collection script's directory.
 
-### Fruit Pick-and-Place in Kitchen and Living Room Environments
 ```bash
-    benchmark_python data_collect/pick_place_fruit/fruit_pick_place_collect.py --table <TABLE> --config <CONFIG> --base <BASE>
-```
-#### Table
-- `kitchen_table`
-- `apartment_table`
-#### Config
-- `apple_pick_place_config.yaml`
-- `banana_pick_place_config.yaml`
-- `carrot_pick_place_config.yaml`
-- `cucumber_pick_place_config.yaml`
-- `mangosteen_pick_place_config.yaml`
-- `whiteradish_pick_place_config.yaml`
-### Base
-- `base_kitchen`
-- `base_apartment`
+# Place a nut and close the box
+benchmark_python data_collect/close_box/box_close_collect.py \
+  --env industry --config box_close_config.yaml
 
-## Standard Evaluation Metrics
+# Transfer and store a book
+benchmark_python data_collect/handover_book/book_handover_collect.py \
+  --env apartment --config book_handover_config.yaml
 
-RoboKino defines four standardized metrics for unified evaluation:
+# Store an apple in a drawer
+benchmark_python data_collect/pull_push_drawer/drawer_pull_push_collect.py \
+  --env apartment --config drawer_pull_push_config.yaml
 
-### Primary Metrics
-
-1. **Task Completion Time (TCT)**: Time taken to complete the task successfully
-2. **Success Rate (SR)**: Percentage of successful task completions
-3. **Dangerous Behavior Rate (DBR)**: Frequency of unsafe actions (collisions, constraint violations)
-4. **Task Completion Proportion (TCP)**: Percentage of subtasks completed (for partial success assessment)
-
-### Additional Analysis
-
-- **Stage-wise Progress**: Completion status of individual task stages
-- **Trajectory Quality**: Smoothness, efficiency, and spatial accuracy
-
-## Assets Library
-
-RoboKino includes 500+ interactive assets:
-
-### Asset Categories
-
-- **Containers**: Boxes, bins, drawers, cabinets
-- **Kitchen Items**: Pots, utensils, appliances
-- **Office Objects**: Documents, staplers, organizers
-- **Tools**: Screwdrivers, wrenches, assembly components
-- **Articulated Objects**: Doors, valves
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### Areas for Contribution
-
-- New atomic controllers
-- Additional task scenarios
-- Improved evaluation metrics
-- Dataset expansion
-- Documentation improvements
-
-## Citation
-
-If you use RoboKino in your research, please cite our paper:
-
-```bibtex
-@article{robokino2026,
-  title={RoboKino: A Scalable Benchmark for Dual-Arm Manipulation with Fine-Grained Evaluation},
-  author={[Authors TBD]},
-  journal={arXiv preprint arXiv:XXXX.XXXXX},
-  year={2026}
-}
+# Screw a pitcher lid
+benchmark_python data_collect/screw_pitcher_lid/pitcher_lid_screw_collect.py \
+  --env apartmentshort --config pitcher_lid_screw_config.yaml
 ```
 
-## License
+Without `--data_path`, output goes to `data/<env>/<task>/episode_00000.hdf5`. Each HDF5 episode contains:
 
-MIT License
+```text
+observations/
+├── images/
+│   ├── left_cam
+│   ├── right_cam
+│   └── head_cam
+└── qpos
+action
+```
 
-Copyright (c) 2026 vigorlee
+Collection writes HDF5. For training with LeRobot Dataset v2.1, use FluxVLA's external [data conversion guide](https://github.com/FluxVLA/FluxVLA/blob/main/docs/data_convert.md). The original upstream training dataset is [FluxBisimData](https://huggingface.co/datasets/limxdynamics/FluxBisimData); it is maintained by LimX Dynamics.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+**Collection reuses episode filenames when restarted in the same output directory. Choose a new `--data_path` for each run to preserve previous data.**
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+## Policy Evaluation
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Evaluation requires ROS 1 Noetic, `roscore`, RViz, `rospy`, `cv_bridge`, `sensor_msgs`, `std_msgs`, and OpenCV accessible to the Isaac Sim Python process. Set up a compatible ROS environment before launching; see the [upstream installation instructions](https://github.com/FluxVLA/FluxBisim#%EF%B8%8F-installation). Binary `cv_bridge` builds must match the Python interpreter used by the simulator.
 
-## Acknowledgments
+In the simulator terminal:
 
-- Isaac Sim team for the powerful simulation platform
-- LeRobot team for the standardized data format
-- Aloha project for the dual-arm platform inspiration
-- The open-source robotics community
+```bash
+source /opt/ros/noetic/setup.bash
+PYTHON_BIN="${ISAAC_SIM_PATH}/python.sh" \
+  bash robokino_benchmark.sh pick_place_banana --num-episodes 100
+```
 
-## Support
+The RoboKino launcher checks the task and required commands, changes to the repository root, then invokes the preserved upstream launcher. Use `bash robokino_benchmark.sh --help` to list tasks.
 
-- **Documentation**: [Coming Soon]
-- **Issues**: [GitHub Issues](https://github.com/vigorlee/RoboKino/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/vigorlee/RoboKino/discussions)
+In a second terminal, run a compatible policy client. For FluxVLA, use its [evaluation instructions](https://github.com/FluxVLA/FluxBisim#model-evaluation) and select a configuration/checkpoint matching the simulator task. Training code and model checkpoints belong to that external project.
 
-<!-- ## Star History
+Supported presets: `close_box`, `handover_book`, `pick_place_banana`, `pull_push_drawer`, and `screw_pitcher_lid`. Additional evaluation flags are `--num-episodes`, `--chunk-size`, and `--save-images true`.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=vigorlee/RoboKino&type=Date)](https://star-history.com/#vigorlee/RoboKino&Date)
--->
+The current evaluator logs **success rate** and **mean/std completion steps** for successful episodes. No RoboKino leaderboard is published in this checkout. TCT, DBR, TCP, and detailed trajectory/coordination reporting require additional implementation and validation.
 
----
+## Repository Layout
 
-*RoboKino establishes a solid foundation for scalable dual-arm robotic systems with community-wide reproducibility.*
+```text
+RoboKino/
+├── controllers/              # RMPflow motion generation and task controllers
+├── data_collect/             # Five collection entry points, YAML configs, HDF5 utilities
+├── envs/                     # Isaac Sim environment, objects, robots, scene configuration
+├── tasks/                    # Task definitions, randomization, success checkers
+├── rviz/                     # Preserved upstream ROS visualization configuration
+├── docs/images/              # Author-supplied RoboKino platform figure
+├── tools/check_repository.py # Checks that do not require Isaac Sim
+├── evaluate.py               # Isaac Sim / ROS policy bridge
+├── robokino_benchmark.sh     # RoboKino evaluation launcher
+├── fluxbisim_benchmark.sh    # Preserved upstream launcher
+├── requirements.txt
+├── LICENSE                  # Original Apache 2.0 license for imported code
+├── licenses/MIT-RoboKino.txt # MIT license for original RoboKino additions
+└── THIRD_PARTY.md            # Pinned upstream source and import scope
+```
+
+## Development and Roadmap
+
+Run the repository checks without starting the simulator:
+
+```bash
+python -m pip install 'PyYAML>=6,<7'
+python tools/check_repository.py
+```
+
+These checks cover Python syntax, YAML parsing, preset/configuration consistency, local documentation links, and figure integrity. Full simulation still requires Isaac Sim, a GPU, and the external assets. See [CONTRIBUTING.md](CONTRIBUTING.md) for adding tasks.
+
+- [x] Import five simulation tasks, atomic controllers, and HDF5 collection.
+- [x] Add the RoboKino overview figure and reproducible usage documentation.
+- [x] Provide the ROS policy-evaluation interface and a RoboKino launcher.
+- [ ] Release RoboKino-specific assets, trajectories, and model configurations.
+- [ ] Extend scene variation and long-horizon skill composition.
+- [ ] Implement and validate TCT, DBR, TCP, and process diagnostics.
+- [ ] Publish benchmark protocols, measured results, and paper citation metadata.
+
+## Attribution and License
+
+The simulation source was imported from [FluxVLA/FluxBisim](https://github.com/FluxVLA/FluxBisim/tree/621df43e08df3f27b5355e65e3f2c2918750bccb), commit `621df43e08df3f27b5355e65e3f2c2918750bccb`, under **Apache 2.0**. Its copyright notices and [LICENSE](LICENSE) are preserved. RoboKino-authored documentation and launcher/checking utilities use [MIT](licenses/MIT-RoboKino.txt); the project figure is supplied by the RoboKino author. See [NOTICE](NOTICE) and [THIRD_PARTY.md](THIRD_PARTY.md) for scope and changes.
+
+Acknowledgements: FluxVLA / LimX Dynamics, AgileX Robotics for the Piper platform description, NVIDIA Isaac Sim, and the LeRobot community. External asset providers include YCB, Lightwheel SimReady, and X-Humanoid ArtVIP, as acknowledged by the upstream project.
+
+Until formal paper metadata is available, cite the [RoboKino repository](https://github.com/vigorlee/RoboKino) with the commit used in your experiment, and also acknowledge FluxBisim when using its implementation.
+
+Questions and reproducibility reports: [GitHub Issues](https://github.com/vigorlee/RoboKino/issues).
